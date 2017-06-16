@@ -34,6 +34,7 @@ public class MainGame extends AppCompatActivity {
 
     private final TextWatcher spaceCharWatcher = new TextWatcher(){
         private int count = 0;
+        private int index = 0;
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             String text = charSequence.toString();
@@ -53,13 +54,35 @@ public class MainGame extends AppCompatActivity {
                         boolean correct = true;
                         final ForegroundColorSpan GREEN = new ForegroundColorSpan(Color.GREEN);
                         //fix for repeated words
-                        int index = (typingScript.getText().toString()).indexOf(scriptWords[count]);
+                        if(count != 0) {
+                            index = (typingScript.getText().toString()).indexOf(scriptWords[count], index + scriptWords[count - 1].length());
+                        }
                         spannable.setSpan(GREEN,
+                                index, index + scriptWords[count].length(), 0);
+                        typingScript.setText(spannable);
+                    }
+                    else{
+                        final ForegroundColorSpan RED = new ForegroundColorSpan(Color.RED);
+                        //fix for repeated words
+                        if(count != 0){
+                            index = (typingScript.getText().toString()).indexOf(scriptWords[count], index + scriptWords[count - 1].length());
+                        }
+
+                        spannable.setSpan(RED,
                                 index, index + scriptWords[count].length(), 0);
                         typingScript.setText(spannable);
                     }
                     count++;
                     editable.clear();
+                }
+                if(scriptWords.length == count){
+                    //reset
+                    final ForegroundColorSpan DKGRAY = new ForegroundColorSpan(Color.DKGRAY);
+                    spannable.setSpan(DKGRAY,
+                            0, typingScript.getText().toString().length(), 0);
+                    typingScript.setText(spannable);
+                    count = 0;
+                    index = 0;
                 }
             }
         }
